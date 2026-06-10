@@ -1,10 +1,10 @@
-local addonName, addon = ...
-local C = addon.Components
+local _, SF = ...
+local C = SF.Components
 
-addon.UI = addon.UI or {}
-local UI = addon.UI
+SF.UI = SF.UI or {}
+local UI = SF.UI
 
-local function T() return addon.Theme end
+local function T() return SF.Theme end
 
 local windows = {}
 
@@ -75,8 +75,8 @@ local function BuildWindow(frameType, opts)
     header:SetScript("OnDragStop", function() win:StopMovingOrSizing() end)
 
     win:SetScript("OnHide", function()
-        if addon.frame == win then
-            addon.frame = nil
+        if SF.frame == win then
+            SF.frame = nil
         end
         if win.onHide then win.onHide() end
     end)
@@ -87,8 +87,8 @@ local function BuildWindow(frameType, opts)
 end
 
 function UI.AcquireWindow(frameType, opts)
-    if addon.frame and addon.frame ~= windows[frameType] then
-        addon.frame:Hide()
+    if SF.frame and SF.frame ~= windows[frameType] then
+        SF.frame:Hide()
     end
 
     local win = windows[frameType]
@@ -111,8 +111,8 @@ function UI.AcquireWindow(frameType, opts)
     content:SetPoint("BOTTOMRIGHT", win, "BOTTOMRIGHT", 0, 0)
     win.content = content
 
-    addon.frame = win
-    addon.frameType = frameType
+    SF.frame = win
+    SF.frameType = frameType
     win:Show()
     win:Raise()
 
