@@ -13,9 +13,13 @@ function C:CreateIconButton(parent, opts)
     local btn = CreateFrame("Button", nil, parent)
     btn:SetSize(sz, sz)
 
-    if opts.texture then
+    if opts.texture or opts.atlas then
         local tex = btn:CreateTexture(nil, "OVERLAY")
-        tex:SetTexture(opts.texture)
+        if opts.atlas then
+            tex:SetAtlas(opts.atlas)
+        else
+            tex:SetTexture(opts.texture)
+        end
         tex:SetVertexColor(normalColor.r, normalColor.g, normalColor.b, normalColor.a)
         tex:SetAllPoints()
         btn._iconTex = tex

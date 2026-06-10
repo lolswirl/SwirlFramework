@@ -7,10 +7,12 @@ function C.T() return SF.Theme end
 function C.ApplyFont(fs, size)
     local font = C.T().font
     -- this is so silly but i am lazy
-    local sz = size == "xsmall" and font.size.small
+    local sz = type(size) == "number" and size
+           or size == "xsmall" and font.size.small
            or size == "small" and font.size.normal
            or size == "large" and (font.size.normal + 2)
            or font.size.normal
+
     fs:SetFont(font.path, sz, "OUTLINE")
     fs:SetShadowOffset(0, 0)
     fs:SetShadowColor(0, 0, 0, 0)

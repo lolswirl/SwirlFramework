@@ -39,7 +39,9 @@ local T = {
     },
 
     font = {
-        path = "Interface\\AddOns\\SharedMedia_SwirlUI\\font\\Swirl.ttf",
+        path = C_AddOns.DoesAddOnExist("SharedMedia_SwirlUI")
+            and "Interface\\AddOns\\SharedMedia_SwirlUI\\font\\Swirl.ttf"
+            or STANDARD_TEXT_FONT,
         size = {
             large = 18,
             normal = 12,

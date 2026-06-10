@@ -1,0 +1,29 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+    <!-- Core -->
+    <Script file="Init.lua"/>
+    <Script file="Theme.lua"/>
+    <Script file="Util.lua"/>
+    <Script file="Window.lua"/>
+
+    <!-- Components -->
+    <Script file="Components/Button.lua"/>
+    <Script file="Components/Card.lua"/>
+    <Script file="Components/ColorPicker.lua"/>
+    <Script file="Components/Dropdown.lua"/>
+    <Script file="Components/EditBox.lua"/>
+    <Script file="Components/EntryBox.lua"/>
+    <Script file="Components/IconButton.lua"/>
+    <Script file="Components/Scrollbar.lua"/>
+    <Script file="Components/Slider.lua"/>
+    <Script file="Components/Tabs.lua"/>
+    <Script file="Components/TextArea.lua"/>
+    <Script file="Components/Toggle.lua"/>
+    <Script file="Components/XYPosition.lua"/>
+
+    <!-- Notifications -->
+    <Script file="Components/Notification/Init.lua"/>
+    <Script file="Components/Notification/Toast.lua"/>
+    <Script file="Components/Notification/Confirm.lua"/>
+
+</Ui>

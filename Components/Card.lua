@@ -63,6 +63,11 @@ function C:CreateCard(parent, title)
         fs:SetTextColor(c.r, c.g, c.b, c.a or 1)
         fs:SetJustifyH("LEFT")
         fs:SetWordWrap(true)
+
+        local cardWidth = self:GetWidth()
+        if cardWidth and cardWidth > 0 then
+            fs:SetWidth(cardWidth - theme2.padding.med * 2)
+        end
         fs:SetText(text or "")
         local yOff = -(self.innerTop + self.contentHeight + theme2.padding.small)
         fs:SetPoint("TOPLEFT",  self, "TOPLEFT",  theme2.padding.med, yOff)
@@ -113,17 +118,18 @@ function C:CreateCard(parent, title)
     return card
 end
 
-function C:CreateDivider(parent, text)
+function C:CreateDivider(parent, text, fontSize)
     local theme = T()
     local container = CreateFrame("Frame", nil, parent)
     container:SetHeight(22)
 
     local lbl = container:CreateFontString(nil, "OVERLAY")
-    ApplyFont(lbl, "normal")
+    ApplyFont(lbl, fontSize or "large")
     lbl:SetText(text or "")
     local color = theme.text.muted
     lbl:SetTextColor(color.r, color.g, color.b, 1)
     lbl:SetPoint("CENTER", container, "CENTER", 0, 0)
+    container.label = lbl
 
     local lineL = container:CreateTexture(nil, "ARTWORK")
     lineL:SetColorTexture(1, 1, 1, 0.10)

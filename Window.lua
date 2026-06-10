@@ -1,0 +1,152 @@
+local addonName, addon = ...
+local C = addon.Components
+
+addon.UI = addon.UI or {}
+local UI = addon.UI
+
+local function T() return addon.Theme end
+
+local windows = {}
+
+local function BuildWindow(frameType, opts)
+    local theme = T()
+    local globalName = "SF_" .. frameType
+
+    local win = CreateFrame("Frame", globalName, UIParent, "BackdropTemplate")
+    win:SetSize(opts.width, opts.height)
+    win:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+    win:SetFrameStrata("HIGH")
+    win:SetToplevel(true)
+    win:SetClampedToScreen(true)
+    win:SetMovable(true)
+    win:EnableMouse(true)
+    C.SetBackdrop(win, theme.bg.dark, theme.border.color)
+
+    local header = CreateFrame("Frame", nil, win, "BackdropTemplate")
+    header:SetHeight(theme.headerHeight)
+    header:SetPoint("TOPLEFT", win, "TOPLEFT", 0, 0)
+    header:SetPoint("TOPRIGHT", win, "TOPRIGHT", 0, 0)
+    C.SetBackdrop(header, theme.bg.med, theme.border.color)
+    win.header = header
+
+    local hdrLine = win:CreateTexture(nil, "ARTWORK")
+    hdrLine:SetHeight(1)
+    hdrLine:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, 0)
+    hdrLine:SetPoint("TOPRIGHT", header, "BOTTOMRIGHT", 0, 0)
+    hdrLine:SetColorTexture(1, 1, 1, 0.12)
+
+    local icon = header:CreateTexture(nil, "OVERLAY")
+    icon:SetSize(18, 18)
+    icon:SetPoint("LEFT", header, "LEFT", theme.padding.med, 0)
+    icon:SetTexture(opts.icon or "")
+
+    local titleFS = header:CreateFontString(nil, "OVERLAY")
+    C.ApplyFont(titleFS, "large")
+    titleFS:SetText("Instance Loadouts")
+    titleFS:SetTextColor(theme.accent.r, theme.accent.g, theme.accent.b, 1)
+    titleFS:SetPoint("LEFT", icon, "RIGHT", 6, 0)
+
+    local pageFS = header:CreateFontString(nil, "OVERLAY")
+    C.ApplyFont(pageFS, "normal")
+    pageFS:SetPoint("CENTER", header, "CENTER", 0, 0)
+    pageFS:SetJustifyH("CENTER")
+    pageFS:SetWordWrap(false)
+    local sec = theme.text.secondary
+    pageFS:SetTextColor(sec.r, sec.g, sec.b, 1)
+    win.pageFS = pageFS
+
+    local closeBtn = C:CreateCloseButton(header, function() win:Hide() end)
+    closeBtn:SetPoint("RIGHT", header, "RIGHT", -6, 0)
+
+    if opts.onGear then
+        local gearBtn = C:CreateIconButton(header, {
+            atlas = "OptionsIcon-Brown",
+            size = 16,
+            onClick = function()
+                if win.onGear then win.onGear() end
+            end,
+        })
+        gearBtn:SetPoint("RIGHT", closeBtn, "LEFT", -4, 0)
+    end
+
+    header:EnableMouse(true)
+    header:RegisterForDrag("LeftButton")
+    header:SetScript("OnDragStart", function() win:StartMoving() end)
+    header:SetScript("OnDragStop", function() win:StopMovingOrSizing() end)
+
+    win:SetScript("OnHide", function()
+        if addon.frame == win then
+            addon.frame = nil
+        end
+        if win.onHide then win.onHide() end
+    end)
+
+    table.insert(UISpecialFrames, globalName)
+
+    return win
+end
+
+function UI.AcquireWindow(frameType, opts)
+    if addon.frame and addon.frame ~= windows[frameType] then
+        addon.frame:Hide()
+    end
+
+    local win = windows[frameType]
+    if not win then
+        win = BuildWindow(frameType, opts)
+        windows[frameType] = win
+    end
+
+    win:SetSize(opts.width, opts.height)
+    win.onHide = opts.onHide
+    win.onGear = opts.onGear
+    win.pageFS:SetText(opts.pageTitle or frameType)
+
+    if win.content then
+        win.content:Hide()
+        win.content:SetParent(nil)
+    end
+    local content = CreateFrame("Frame", nil, win)
+    content:SetPoint("TOPLEFT", win.header, "BOTTOMLEFT", 0, -1)
+    content:SetPoint("BOTTOMRIGHT", win, "BOTTOMRIGHT", 0, 0)
+    win.content = content
+
+    addon.frame = win
+    addon.frameType = frameType
+    win:Show()
+    win:Raise()
+
+    return win, content
+end
+
+local messageDialog = nil
+
+function UI.ShowMessage(text, width)
+    local theme = T()
+    local N = C.Notification
+    if not messageDialog then
+        messageDialog = N.BuildPanel("SF_MessagePopup", 320, 100, "DIALOG")
+
+        local msg = messageDialog:CreateFontString(nil, "OVERLAY")
+        msg:SetPoint("TOPLEFT", messageDialog, "TOPLEFT", 14, -12)
+        msg:SetPoint("TOPRIGHT", messageDialog, "TOPRIGHT", -10, -12)
+        msg:SetJustifyH("LEFT")
+        C.ApplyFont(msg, "small")
+        messageDialog.msg = msg
+
+        local okBtn = C:CreateButton(messageDialog, "OK", {
+            width = 70,
+            height = 20,
+            callback = function() N.FadeOut(messageDialog, nil) end,
+        })
+        okBtn:SetPoint("BOTTOM", messageDialog, "BOTTOM", 0, 10)
+    end
+
+    C.SetBackdrop(messageDialog, theme.bg.dark, theme.border.color)
+    N.ApplyAccent(messageDialog)
+    messageDialog:SetWidth(width or 320)
+    messageDialog.msg:SetText(text)
+    messageDialog:SetHeight(messageDialog.msg:GetStringHeight() + 12 + 20 + 22)
+
+    N.FadeIn(messageDialog)
+end

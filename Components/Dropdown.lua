@@ -4,10 +4,10 @@ local T, ApplyFont, SetBackdrop = C.T, C.ApplyFont, C.SetBackdrop
 
 local ITEM_H = 22
 local MAX_LIST_H = 300
-local CHEVRON_TEX = "Interface\\AddOns\\SwirlUI\\UI\\Media\\Chevron.png"
+local CHEVRON_TEX = "Interface\\AddOns\\SF\\Media\\Chevron.png"
 local ANIM_DUR = 0.12
 
-local overlay = CreateFrame("Frame", "SwirlUI_DropdownOverlay", UIParent)
+local overlay = CreateFrame("Frame", "SF_DropdownOverlay", UIParent)
 overlay:SetAllPoints()
 overlay:SetFrameStrata("TOOLTIP")
 overlay:EnableMouse(false)
@@ -100,7 +100,11 @@ function C:CreateDropdown(parent, labelText, options, initialValue, onChange)
         for i = #_options, 1, -1 do _options[i] = nil end
         if not opts then return end
         for _, v in ipairs(opts) do
-            _options[#_options+1] = v
+            if type(v) == "table" then
+                _options[#_options+1] = { text = tostring(v.text), value = v.value }
+            else
+                _options[#_options+1] = { text = tostring(v), value = v }
+            end
         end
     end
     ParseOptions(options)
@@ -108,8 +112,15 @@ function C:CreateDropdown(parent, labelText, options, initialValue, onChange)
     local currentValue = initialValue
     local itemBtns = {}
 
+    local function TextForValue(val)
+        for _, opt in ipairs(_options) do
+            if opt.value == val then return opt.text end
+        end
+        return val ~= nil and tostring(val) or ""
+    end
+
     local function SetSelectedText(val)
-        selText:SetText(val ~= nil and tostring(val) or "")
+        selText:SetText(TextForValue(val))
     end
     SetSelectedText(currentValue)
 
@@ -117,7 +128,7 @@ function C:CreateDropdown(parent, labelText, options, initialValue, onChange)
         for _, ib in ipairs(itemBtns) do ib:Hide() end
         itemBtns = {}
         local th = T()
-        for i, val in ipairs(_options) do
+        for i, opt in ipairs(_options) do
             local ib = CreateFrame("Button", nil, sc)
             ib:SetHeight(ITEM_H)
             ib:SetPoint("TOPLEFT",  sc, "TOPLEFT",  0, -(i-1)*ITEM_H)
@@ -135,22 +146,22 @@ function C:CreateDropdown(parent, labelText, options, initialValue, onChange)
             ApplyFont(iText, "small")
 
             local function UpdateColor()
-                local c = (currentValue == val) and T().accent or T().text.secondary
+                local c = (currentValue == opt.value) and T().accent or T().text.secondary
                 iText:SetTextColor(c.r, c.g, c.b, 1)
             end
             UpdateColor()
-            iText:SetText(val)
+            iText:SetText(opt.text)
 
             ib:SetScript("OnEnter", function() hbg:Show(); iText:SetTextColor(1, 1, 1, 1) end)
             ib:SetScript("OnLeave", function() hbg:Hide(); UpdateColor() end)
             ib:SetScript("OnClick", function()
-                currentValue = val
-                SetSelectedText(val)
+                currentValue = opt.value
+                SetSelectedText(opt.value)
                 for _, b in ipairs(itemBtns) do
                     if b._updateColor then b._updateColor() end
                 end
                 row:_close()
-                if onChange then onChange(val) end
+                if onChange then onChange(opt.value) end
             end)
             ib._updateColor = UpdateColor
             itemBtns[#itemBtns+1] = ib

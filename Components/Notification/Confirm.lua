@@ -51,7 +51,7 @@ local function BuildConfirm()
     cancelBtn:SetScript("OnLeave", function() cancelBtn:SetBackdropBorderColor(0, 0, 0, 1) end)
 end
 
-function C.ShowConfirm(text, onConfirm, onCancel)
+function C.ShowConfirm(text, onConfirm, onCancel, width)
     if not confirm then BuildConfirm() end
 
     local theme = C.T()
@@ -63,7 +63,9 @@ function C.ShowConfirm(text, onConfirm, onCancel)
     confirm.okLabel:SetTextColor(s.r, s.g, s.b, 1)
     local e = theme.error
     confirm.cancelLabel:SetTextColor(e.r, e.g, e.b, 1)
+    confirm:SetWidth(width or CONFIRM_W)
     confirm.msg:SetText(text)
+    confirm:SetHeight(math.max(CONFIRM_H, confirm.msg:GetStringHeight() + 12 + BTN_H + 22))
 
     confirm.okBtn:SetScript("OnClick", function()
         N.FadeOut(confirm, nil)
