@@ -1,11 +1,11 @@
-local _, SF = ...
+local addon, SF = ...
 local C = SF.Components
 local T, ApplyFont, SetBackdrop = C.T, C.ApplyFont, C.SetBackdrop
 
 function C:CreateSlider(parent, labelText, minVal, maxVal, step, getVal, setVal, config)
     config = config or {}
     local theme = T()
-    local stepperTexture = "Interface\\AddOns\\SF\\Media\\Chevron.png"
+    local stepperTexture = SF.MediaPath("UI\\Media\\Chevron.png")
 
     local row = CreateFrame("Frame", nil, parent)
     row:SetHeight(36)

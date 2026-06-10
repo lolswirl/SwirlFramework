@@ -4,7 +4,6 @@ local T, ApplyFont, SetBackdrop = C.T, C.ApplyFont, C.SetBackdrop
 
 local ITEM_H = 22
 local MAX_LIST_H = 300
-local CHEVRON_TEX = "Interface\\AddOns\\SF\\Media\\Chevron.png"
 local ANIM_DUR = 0.12
 
 local overlay = CreateFrame("Frame", "SF_DropdownOverlay", UIParent)
@@ -46,7 +45,7 @@ function C:CreateDropdown(parent, labelText, options, initialValue, onChange)
     local arrow = btn:CreateTexture(nil, "ARTWORK")
     arrow:SetSize(14, 14)
     arrow:SetPoint("RIGHT", btn, "RIGHT", -4, 0)
-    arrow:SetTexture(CHEVRON_TEX)
+    arrow:SetTexture(SF.MediaPath("UI\\Media\\Chevron.png"))
     arrow:SetVertexColor(ac.r, ac.g, ac.b, 1)
     arrow:SetRotation(math.rad(90))
     arrow:SetTexelSnappingBias(0)
