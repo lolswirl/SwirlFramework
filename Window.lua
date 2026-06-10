@@ -118,35 +118,3 @@ function UI.AcquireWindow(frameType, opts)
 
     return win, content
 end
-
-local messageDialog = nil
-
-function UI.ShowMessage(text, width)
-    local theme = T()
-    local N = C.Notification
-    if not messageDialog then
-        messageDialog = N.BuildPanel("SF_MessagePopup", 320, 100, "DIALOG")
-
-        local msg = messageDialog:CreateFontString(nil, "OVERLAY")
-        msg:SetPoint("TOPLEFT", messageDialog, "TOPLEFT", 14, -12)
-        msg:SetPoint("TOPRIGHT", messageDialog, "TOPRIGHT", -10, -12)
-        msg:SetJustifyH("LEFT")
-        C.ApplyFont(msg, "small")
-        messageDialog.msg = msg
-
-        local okBtn = C:CreateButton(messageDialog, "OK", {
-            width = 70,
-            height = 20,
-            callback = function() N.FadeOut(messageDialog, nil) end,
-        })
-        okBtn:SetPoint("BOTTOM", messageDialog, "BOTTOM", 0, 10)
-    end
-
-    C.SetBackdrop(messageDialog, theme.bg.dark, theme.border.color)
-    N.ApplyAccent(messageDialog)
-    messageDialog:SetWidth(width or 320)
-    messageDialog.msg:SetText(text)
-    messageDialog:SetHeight(messageDialog.msg:GetStringHeight() + 12 + 20 + 22)
-
-    N.FadeIn(messageDialog)
-end

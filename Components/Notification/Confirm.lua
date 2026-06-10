@@ -67,6 +67,14 @@ function C.ShowConfirm(text, onConfirm, onCancel, width)
     confirm.msg:SetText(text)
     confirm:SetHeight(math.max(CONFIRM_H, confirm.msg:GetStringHeight() + 12 + BTN_H + 22))
 
+    if onCancel then
+        confirm.cancelBtn:Show()
+        confirm.okBtn:SetPoint("BOTTOMRIGHT", confirm, "BOTTOM", -4, 10)
+    else
+        confirm.cancelBtn:Hide()
+        confirm.okBtn:SetPoint("BOTTOMRIGHT", confirm, "BOTTOM", BTN_W / 2 + 4, 10)
+    end
+
     confirm.okBtn:SetScript("OnClick", function()
         N.FadeOut(confirm, nil)
         if onConfirm then onConfirm() end
