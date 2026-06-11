@@ -34,7 +34,7 @@ function C:ApplyScrollbar(scrollFrame, scrollChild, parent)
     local function UpdateThumb()
         local frameH = scrollFrame:GetHeight()
         local childH = scrollChild:GetHeight()
-        if frameH == 0 or childH <= frameH then track:Hide(); return end
+        if frameH == 0 or childH <= frameH + 0.5 then track:Hide(); return end
         track:Show()
         local trackH    = track:GetHeight()
         local ratio     = frameH / childH
@@ -112,7 +112,7 @@ function C:CreateTabScroller(tabFrame)
     local function UpdateScrollBarVisibility()
         local contentH = scrollChild:GetHeight()
         local frameH   = scrollFrame:GetHeight()
-        scrollbarVisible = contentH > frameH
+        scrollbarVisible = contentH > frameH + 0.5
         UpdateScrollChildWidth()
     end
 
@@ -127,6 +127,7 @@ function C:CreateTabScroller(tabFrame)
     track:HookScript("OnHide", function() scrollbarVisible = false; UpdateScrollChildWidth() end)
 
     local _yOff = theme.padding.small
+    local _cardCount = 0
 
     function scrollChild:PlaceCard(card, yOffset)
         card:SetPoint("TOPLEFT", self, "TOPLEFT", theme.padding.small, -yOffset)
@@ -135,16 +136,25 @@ function C:CreateTabScroller(tabFrame)
     end
 
     function scrollChild:AddCard(card)
-        self:PlaceCard(card, _yOff)
-        _yOff = _yOff + card:GetHeight() + theme.padding.small
+        local offset = _yOff
+        if _cardCount > 0 then
+            offset = _yOff + theme.padding.small
+        end
+        self:PlaceCard(card, offset)
+        _yOff = offset + card:GetHeight()
+        _cardCount = _cardCount + 1
         return card
     end
 
-    function scrollChild:Commit(yOffset)
+    function scrollChild:Commit(yOffset, onSized)
         local h = yOffset or _yOff
+        local totalH = h + theme.padding.small
         C_Timer.After(0, function()
-            self:SetHeight(h + theme.padding.small)
-            UpdateScrollBarVisibility()
+            self:SetHeight(totalH)
+            if onSized then onSized(totalH) end
+            C_Timer.After(0, function()
+UpdateScrollBarVisibility()
+            end)
         end)
     end
 

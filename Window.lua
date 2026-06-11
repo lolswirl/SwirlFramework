@@ -13,7 +13,7 @@ local function BuildWindow(frameType, opts)
     local globalName = "SF_" .. frameType
 
     local win = CreateFrame("Frame", globalName, UIParent, "BackdropTemplate")
-    win:SetSize(opts.width, opts.height)
+    win:SetSize(opts.width, opts.height == "auto" and 100 or opts.height)
     win:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
     win:SetFrameStrata("HIGH")
     win:SetToplevel(true)
@@ -98,11 +98,22 @@ function UI.AcquireWindow(frameType, opts)
         windows[frameType] = win
     end
 
-    win:SetSize(opts.width, opts.height)
+    local autoHeight = opts.height == "auto"
+    if not autoHeight then
+        win:SetSize(opts.width, opts.height)
+    else
+        win:SetWidth(opts.width)
+    end
     win.onHide = opts.onHide
     win.onGear = opts.onGear
     win.pageFS:SetText(opts.pageTitle or "")
     win.titleFS:SetText(opts.title or SF.addonName or "")
+
+    win.FitToContent = autoHeight and function(contentH)
+        local theme = T()
+        -- header + 1px header line + scrollframe insets (1px top + 1px bottom) + content + 1px bottom margin
+        win:SetHeight(theme.headerHeight + 1 + 2 + contentH + 1)
+    end or nil
 
     if win.content then
         win.content:Hide()
