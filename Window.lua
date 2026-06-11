@@ -42,9 +42,10 @@ local function BuildWindow(frameType, opts)
 
     local titleFS = header:CreateFontString(nil, "OVERLAY")
     C.ApplyFont(titleFS, "large")
-    titleFS:SetText("Instance Loadouts")
+    titleFS:SetText(opts.title or SF.addonName or "")
     titleFS:SetTextColor(theme.accent.r, theme.accent.g, theme.accent.b, 1)
     titleFS:SetPoint("LEFT", icon, "RIGHT", 6, 0)
+    win.titleFS = titleFS
 
     local pageFS = header:CreateFontString(nil, "OVERLAY")
     C.ApplyFont(pageFS, "normal")
@@ -100,7 +101,8 @@ function UI.AcquireWindow(frameType, opts)
     win:SetSize(opts.width, opts.height)
     win.onHide = opts.onHide
     win.onGear = opts.onGear
-    win.pageFS:SetText(opts.pageTitle or frameType)
+    win.pageFS:SetText(opts.pageTitle or "")
+    win.titleFS:SetText(opts.title or SF.addonName or "")
 
     if win.content then
         win.content:Hide()
