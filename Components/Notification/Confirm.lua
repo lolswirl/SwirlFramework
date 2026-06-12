@@ -110,7 +110,8 @@ function C.ShowConfirm(text, onConfirm, onCancel, width, parent)
 
     local function dismiss(cb)
         if parent then GetDimOverlay():Hide() end
-        N.FadeOut(confirm, cb)
+        if cb then cb() end
+        N.FadeOut(confirm, nil)
     end
 
     confirm.okBtn:SetScript("OnClick", function()
