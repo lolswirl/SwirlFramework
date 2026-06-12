@@ -8,6 +8,21 @@ local BTN_W = 70
 local BTN_H = 20
 
 local confirm = nil
+local dimOverlay = nil
+
+local function GetDimOverlay()
+    if not dimOverlay then
+        dimOverlay = CreateFrame("Frame", nil, UIParent)
+        dimOverlay:SetFrameStrata("DIALOG")
+        dimOverlay:SetFrameLevel(1)
+        dimOverlay:EnableMouse(true)
+        local bg = dimOverlay:CreateTexture(nil, "BACKGROUND")
+        bg:SetAllPoints()
+        bg:SetColorTexture(0, 0, 0, 0.6)
+        dimOverlay:Hide()
+    end
+    return dimOverlay
+end
 
 local function BuildConfirm()
     confirm = N.BuildPanel("SF_ConfirmPopup", CONFIRM_W, CONFIRM_H, "DIALOG")
@@ -51,7 +66,7 @@ local function BuildConfirm()
     cancelBtn:SetScript("OnLeave", function() cancelBtn:SetBackdropBorderColor(0, 0, 0, 1) end)
 end
 
-function C.ShowConfirm(text, onConfirm, onCancel, width)
+function C.ShowConfirm(text, onConfirm, onCancel, width, parent)
     if not confirm then BuildConfirm() end
 
     local theme = C.T()
@@ -75,13 +90,34 @@ function C.ShowConfirm(text, onConfirm, onCancel, width)
         confirm.okBtn:SetPoint("BOTTOMRIGHT", confirm, "BOTTOM", -4, 10)
     end
 
+    if parent then
+        local dim = GetDimOverlay()
+        dim:SetAllPoints(parent)
+        dim:SetParent(parent)
+        dim:SetFrameLevel(parent:GetFrameLevel() + 10)
+        dim:Show()
+        confirm:SetParent(parent)
+        confirm:SetFrameStrata(parent:GetFrameStrata())
+        confirm:SetFrameLevel(parent:GetFrameLevel() + 20)
+        confirm:ClearAllPoints()
+        confirm:SetPoint("CENTER", parent, "CENTER", 0, 0)
+    else
+        confirm:SetParent(UIParent)
+        confirm:SetFrameStrata("DIALOG")
+        confirm:ClearAllPoints()
+        confirm:SetPoint("TOP", UIParent, "TOP", 0, -175)
+    end
+
+    local function dismiss(cb)
+        if parent then GetDimOverlay():Hide() end
+        N.FadeOut(confirm, cb)
+    end
+
     confirm.okBtn:SetScript("OnClick", function()
-        N.FadeOut(confirm, nil)
-        if onConfirm then onConfirm() end
+        dismiss(onConfirm)
     end)
     confirm.cancelBtn:SetScript("OnClick", function()
-        N.FadeOut(confirm, nil)
-        if onCancel then onCancel() end
+        dismiss(onCancel)
     end)
 
     N.FadeIn(confirm)
