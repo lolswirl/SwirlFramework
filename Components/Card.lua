@@ -55,10 +55,10 @@ function C:CreateCard(parent, title)
         self:SetHeight(self.innerTop + self.contentHeight + theme2.padding.med)
     end
 
-    function card:AddLabel(text, color)
+    function card:AddLabel(text, color, textSize)
         local theme2 = T()
         local fs = self:CreateFontString(nil, "OVERLAY")
-        ApplyFont(fs, "normal")
+        ApplyFont(fs, textSize or "normal")
         local c = color or theme2.text.secondary
         fs:SetTextColor(c.r, c.g, c.b, c.a or 1)
         fs:SetJustifyH("LEFT")
