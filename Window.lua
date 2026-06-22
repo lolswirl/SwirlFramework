@@ -131,3 +131,14 @@ function UI.AcquireWindow(frameType, opts)
 
     return win, content
 end
+
+function UI.HideAll()
+    local closedAny = false
+    for _, win in pairs(windows) do
+        if win:IsShown() then
+            win:Hide()
+            closedAny = true
+        end
+    end
+    return closedAny
+end
